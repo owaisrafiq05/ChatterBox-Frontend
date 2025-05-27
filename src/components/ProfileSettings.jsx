@@ -97,7 +97,7 @@ const ProfileSettings = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto">
                 <div className="bg-[#242424] rounded-lg shadow-xl p-8">
                     <h2 className="text-2xl font-bold text-white mb-8">Profile Settings</h2>

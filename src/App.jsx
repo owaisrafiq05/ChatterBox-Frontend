@@ -6,7 +6,7 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import ProfileSettings from './components/ProfileSettings';
 import Sidebar from './components/Sidebar';
-
+import Dashboard from './components/Dashboard';
 const App = () => {
     return (
         <Router>
@@ -25,6 +25,7 @@ const App = () => {
                                 <div className="flex">
                                     <Sidebar />
                                     <main className="flex-1 ml-20 lg:ml-64">
+                                        <Dashboard />
                                         <div className="p-8">
                                             <h1 className="text-2xl font-bold text-white">Dashboard</h1>
                                         </div>
