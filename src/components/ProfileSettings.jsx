@@ -1,23 +1,25 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
+import axios from 'axios';
 
 const ProfileSettings = () => {
     const { user, updateProfile } = useAuth();
     const [formData, setFormData] = useState({
         displayName: '',
-        bio: '',
-        avatar: ''
+        bio: ''
     });
     const [loading, setLoading] = useState(false);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [previewUrl, setPreviewUrl] = useState('');
 
     useEffect(() => {
         if (user) {
             setFormData({
                 displayName: user.displayName || '',
-                bio: user.bio || '',
-                avatar: user.avatar || ''
+                bio: user.bio || ''
             });
+            setPreviewUrl(user.avatar || '');
         }
     }, [user]);
 
@@ -26,15 +28,69 @@ const ProfileSettings = () => {
         setFormData(prev => ({ ...prev, [id]: value }));
     };
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                toast.error('Please select an image file');
+                return;
+            }
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error('File size should be less than 5MB');
+                return;
+            }
+            setSelectedFile(file);
+            setPreviewUrl(URL.createObjectURL(file));
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
         try {
-            await updateProfile(formData);
+            const formDataToSend = new FormData();
+            
+            // Only append fields that have values
+            if (formData.displayName) {
+                formDataToSend.append('displayName', formData.displayName);
+            }
+            if (formData.bio) {
+                formDataToSend.append('bio', formData.bio);
+            }
+            if (selectedFile) {
+                formDataToSend.append('avatar', selectedFile);
+            }
+
+            console.log('Sending form data:', {
+                displayName: formData.displayName,
+                bio: formData.bio,
+                hasFile: !!selectedFile,
+                fileName: selectedFile?.name
+            });
+
+            const response = await axios.put(
+                `${import.meta.env.VITE_API_URL}/api/auth/profile`,
+                formDataToSend,
+                {
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            );
+
+            if (response.data.success) {
+                toast.success('Profile updated successfully');
+                updateProfile(response.data.data);
+                // Clear the selected file after successful upload
+                setSelectedFile(null);
+            }
         } catch (error) {
             console.error('Profile update error:', error);
-            toast.error('Failed to update profile');
+            toast.error(error.response?.data?.message || 'Failed to update profile');
         } finally {
             setLoading(false);
         }
@@ -51,7 +107,7 @@ const ProfileSettings = () => {
                         <div className="flex items-center space-x-6">
                             <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-700">
                                 <img
-                                    src={formData.avatar || '/default-avatar.png'}
+                                    src={previewUrl || '/default-avatar.png'}
                                     alt="Profile"
                                     className="w-full h-full object-cover"
                                 />
@@ -65,19 +121,7 @@ const ProfileSettings = () => {
                                     id="avatar"
                                     accept="image/*"
                                     className="hidden"
-                                    onChange={(e) => {
-                                        const file = e.target.files[0];
-                                        if (file) {
-                                            const reader = new FileReader();
-                                            reader.onloadend = () => {
-                                                setFormData(prev => ({
-                                                    ...prev,
-                                                    avatar: reader.result
-                                                }));
-                                            };
-                                            reader.readAsDataURL(file);
-                                        }
-                                    }}
+                                    onChange={handleFileChange}
                                 />
                                 <button
                                     type="button"
@@ -86,6 +130,9 @@ const ProfileSettings = () => {
                                 >
                                     Change Avatar
                                 </button>
+                                <p className="mt-2 text-xs text-gray-400">
+                                    Max file size: 5MB. Supported formats: JPG, PNG, GIF
+                                </p>
                             </div>
                         </div>
 
