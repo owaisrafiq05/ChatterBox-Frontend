@@ -7,6 +7,7 @@ import Signup from './components/Signup';
 import ProfileSettings from './components/ProfileSettings';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
+import AudioRoom from './components/AudioRoom';
 const App = () => {
     return (
         <Router>
@@ -47,7 +48,7 @@ const App = () => {
                             </ProtectedRoute>
                         }
                     />
-
+                    <Route path="/room/:roomId" element={<AudioRoom />} />
                     {/* Redirect root to dashboard if authenticated, otherwise to login */}
                     <Route
                         path="/"
