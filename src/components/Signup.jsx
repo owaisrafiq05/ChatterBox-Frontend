@@ -1,6 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -13,7 +12,13 @@ const Signup = () => {
     });
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { register, user } = useAuth();
+
+    useEffect(() => {
+        if (user) {
+            navigate('/dashboard');
+        }
+    }, [user, navigate]);
 
     const handleChange = (e) => {
         const { id, value } = e.target;
@@ -47,19 +52,14 @@ const Signup = () => {
 
         setLoading(true);
         try {
-            const response = await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/auth/register`,
-                {
-                    username: formData.username,
-                    email: formData.email,
-                    password: formData.password
-                },
-                { withCredentials: true }
-            );
-
-            if (response.data.success) {
+            const success = await register({
+                username: formData.username,
+                email: formData.email,
+                password: formData.password
+            });
+            
+            if (success) {
                 toast.success('Registration successful!');
-                login(response.data.data, response.data.token);
             }
         } catch (error) {
             console.error('Signup error:', error);
@@ -76,33 +76,7 @@ const Signup = () => {
                 <div className="absolute inset-0 bg-black bg-opacity-30 z-10 flex flex-col justify-center items-center">
                     <div className="text-center p-8">
                         <h1 className="text-5xl font-bold text-white mb-4">ChatterBox</h1>
-                        <p className="text-xl text-white mb-8">Real-time audio chat rooms for meaningful conversations</p>
-                        <div className="flex flex-col space-y-4">
-                            <div className="flex items-center space-x-3">
-                                <div className="bg-blue-600 p-2 rounded-full">
-                                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                </div>
-                                <span className="text-white">Real-time audio conversations</span>
-                            </div>
-                            <div className="flex items-center space-x-3">
-                                <div className="bg-blue-600 p-2 rounded-full">
-                                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                </div>
-                                <span className="text-white">Create and join chat rooms</span>
-                            </div>
-                            <div className="flex items-center space-x-3">
-                                <div className="bg-blue-600 p-2 rounded-full">
-                                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                </div>
-                                <span className="text-white">Connect with people worldwide</span>
-                            </div>
-                        </div>
+                        <p className="text-xl text-white mb-8">Join our community of real-time conversations</p>
                     </div>
                 </div>
                 <img
@@ -115,12 +89,8 @@ const Signup = () => {
             {/* Right side - Signup Form */}
             <div className="w-full lg:w-1/2 flex items-center justify-center bg-gradient-to-br from-blue-700 via-blue-900 to-[#1a1a1a] p-4">
                 <div className="w-full max-w-[500px] p-8 bg-[#242424] rounded-lg shadow-2xl">
-                    <div className="mobile-logo block lg:hidden mb-4 text-center">
-                        <h1 className="text-3xl font-bold text-white">ChatterBox</h1>
-                    </div>
                     <h2 className="text-2xl font-bold text-white mb-6 text-center">Create your account</h2>
-
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
                             <label className="text-sm text-gray-300 mb-1.5 block">Username</label>
                             <input
@@ -128,12 +98,10 @@ const Signup = () => {
                                 id="username"
                                 value={formData.username}
                                 onChange={handleChange}
-                                className="w-full px-4 py-2.5 bg-[#2a2a2a] border border-gray-700 rounded-lg text-white 
-                                         focus:outline-none focus:border-blue-500 transition-colors"
+                                className="w-full px-4 py-2.5 bg-[#2a2a2a] border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
                                 required
                             />
                         </div>
-
                         <div>
                             <label className="text-sm text-gray-300 mb-1.5 block">Email Address</label>
                             <input
@@ -141,12 +109,10 @@ const Signup = () => {
                                 id="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                className="w-full px-4 py-2.5 bg-[#2a2a2a] border border-gray-700 rounded-lg text-white 
-                                         focus:outline-none focus:border-blue-500 transition-colors"
+                                className="w-full px-4 py-2.5 bg-[#2a2a2a] border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
                                 required
                             />
                         </div>
-
                         <div>
                             <label className="text-sm text-gray-300 mb-1.5 block">Password</label>
                             <input
@@ -154,12 +120,10 @@ const Signup = () => {
                                 id="password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                className="w-full px-4 py-2.5 bg-[#2a2a2a] border border-gray-700 rounded-lg text-white 
-                                         focus:outline-none focus:border-blue-500 transition-colors"
+                                className="w-full px-4 py-2.5 bg-[#2a2a2a] border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
                                 required
                             />
                         </div>
-
                         <div>
                             <label className="text-sm text-gray-300 mb-1.5 block">Confirm Password</label>
                             <input
@@ -167,48 +131,36 @@ const Signup = () => {
                                 id="confirmPassword"
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
-                                className="w-full px-4 py-2.5 bg-[#2a2a2a] border border-gray-700 rounded-lg text-white 
-                                         focus:outline-none focus:border-blue-500 transition-colors"
+                                className="w-full px-4 py-2.5 bg-[#2a2a2a] border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
                                 required
                             />
                         </div>
-
-                        <div className="mt-6">
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg 
-                                        transition-colors duration-200 font-medium flex items-center justify-center"
-                            >
-                                {loading ? (
-                                    <>
-                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Creating Account...
-                                    </>
-                                ) : (
-                                    "Sign Up"
-                                )}
-                            </button>
-                        </div>
-
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 font-medium flex items-center justify-center mt-6"
+                        >
+                            {loading ? (
+                                <>
+                                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Creating Account...
+                                </>
+                            ) : (
+                                "Create Account"
+                            )}
+                        </button>
                         <p className="text-center text-gray-400 text-sm mt-6">
                             Already have an account?{" "}
-                            <a
-                                href="/login"
+                            <Link
+                                to="/login"
                                 className="text-blue-500 hover:text-blue-400 transition-colors"
                             >
                                 Log in
-                            </a>
+                            </Link>
                         </p>
-
-                        <div className="pt-4 text-xs text-center text-gray-500">
-                            By signing up, you agree to ChatterBox's{" "}
-                            <a href="/terms" className="text-blue-500 hover:text-blue-400 ml-1">Terms of Service</a> and{" "}
-                            <a href="/privacy" className="text-blue-500 hover:text-blue-400 ml-1">Privacy Policy</a>
-                        </div>
                     </form>
                 </div>
             </div>

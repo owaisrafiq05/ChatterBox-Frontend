@@ -40,30 +40,36 @@ const Sidebar = () => {
     ];
 
     return (
-        <div className="fixed inset-y-0 left-0 w-20 lg:w-64 bg-[#1a1a1a] border-r border-gray-800 transition-all duration-300">
+        <div className="fixed top-0 left-0 h-screen w-20 lg:w-64 bg-[#1a1a1a] text-white flex flex-col">
             {/* Logo */}
-            <div className="h-16 flex items-center justify-center lg:justify-start lg:px-6 border-b border-gray-800">
-                <h1 className="text-xl font-bold text-white hidden lg:block">ChatterBox</h1>
-                <h1 className="text-xl font-bold text-white lg:hidden">CB</h1>
+            <div className="p-4 border-b border-gray-800">
+                <h1 className="text-xl font-bold hidden lg:block">ChatterBox</h1>
+                <h1 className="text-xl font-bold lg:hidden">CB</h1>
             </div>
 
             {/* Navigation */}
-            <nav className="mt-6">
-                {navItems.map((item) => (
-                    <Link
-                        key={item.path}
-                        to={item.path}
-                        className={`flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors
-                            ${isActive(item.path) ? 'bg-gray-800 text-white' : ''}`}
-                    >
-                        <span className="text-gray-400 group-hover:text-white">{item.icon}</span>
-                        <span className="ml-4 hidden lg:block">{item.name}</span>
-                    </Link>
-                ))}
+            <nav className="flex-1 p-4">
+                <ul className="space-y-2">
+                    {navItems.map((item) => (
+                        <li key={item.path}>
+                            <Link
+                                to={item.path}
+                                className={`flex items-center space-x-3 p-3 rounded-lg transition-colors ${
+                                    isActive(item.path)
+                                        ? 'bg-blue-600 text-white'
+                                        : 'hover:bg-gray-800'
+                                }`}
+                            >
+                                {item.icon}
+                                <span className="hidden lg:block">{item.name}</span>
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
             </nav>
 
             {/* User Profile */}
-            <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
+            <div className="p-4 border-t border-gray-800">
                 <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-700">
                         <img

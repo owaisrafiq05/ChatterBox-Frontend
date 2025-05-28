@@ -7,7 +7,8 @@ import Signup from './components/Signup';
 import ProfileSettings from './components/ProfileSettings';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
-import AudioRoom from './components/AudioRoom';
+import Room from './components/Room';
+
 const App = () => {
     return (
         <Router>
@@ -17,6 +18,7 @@ const App = () => {
                     {/* Public Routes */}
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
+                    {/* <Route path="/dashboard" element={<Dashboard />} /> */}
 
                     {/* Protected Routes */}
                     <Route
@@ -27,9 +29,6 @@ const App = () => {
                                     <Sidebar />
                                     <main className="flex-1 ml-20 lg:ml-64">
                                         <Dashboard />
-                                        <div className="p-8">
-                                            <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-                                        </div>
                                     </main>
                                 </div>
                             </ProtectedRoute>
@@ -48,7 +47,14 @@ const App = () => {
                             </ProtectedRoute>
                         }
                     />
-                    <Route path="/room/:roomId" element={<AudioRoom />} />
+                    <Route
+                        path="/room/:id"
+                        element={
+                            <ProtectedRoute>
+                                <Room />
+                            </ProtectedRoute>
+                        }
+                    />
                     {/* Redirect root to dashboard if authenticated, otherwise to login */}
                     <Route
                         path="/"

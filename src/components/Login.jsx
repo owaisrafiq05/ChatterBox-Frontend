@@ -1,6 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -11,7 +10,13 @@ const Login = () => {
     });
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login, user } = useAuth();
+
+    useEffect(() => {
+        if (user) {
+            navigate('/dashboard');
+        }
+    }, [user, navigate]);
 
     const handleChange = (e) => {
         const { id, value } = e.target;
@@ -37,15 +42,9 @@ const Login = () => {
 
         setLoading(true);
         try {
-            const response = await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/auth/login`,
-                formData,
-                { withCredentials: true }
-            );
-
-            if (response.data.success) {
+            const success = await login(formData);
+            if (success) {
                 toast.success('Login successful!');
-                login(response.data.data, response.data.token);
             }
         } catch (error) {
             console.error('Login error:', error);
@@ -156,12 +155,12 @@ const Login = () => {
 
                         <p className="text-center text-gray-400 text-sm mt-6">
                             Don't have an account?{" "}
-                            <a
-                                href="/signup"
+                            <Link
+                                to="/signup"
                                 className="text-blue-500 hover:text-blue-400 transition-colors"
                             >
                                 Sign up
-                            </a>
+                            </Link>
                         </p>
 
                         <div className="pt-4 text-xs text-center text-gray-500">
